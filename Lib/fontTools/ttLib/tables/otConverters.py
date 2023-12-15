@@ -19,6 +19,7 @@ from .otBase import (
 from .otTables import (
     lookupTypes,
     VarCompositeGlyph,
+    CvarEncodedValues,
     AATStateTable,
     AATState,
     AATAction,
@@ -1998,6 +1999,7 @@ converterMapping = {
     "CompositeMode": CompositeMode,
     "STATFlags": STATFlags,
     "VarCompositeGlyphList": partial(CFF2Index, itemClass=VarCompositeGlyph),
+    "MultiVarDataValue": partial(CFF2Index, itemClass=CvarEncodedValues),
     # AAT
     "CIDGlyphMap": CIDGlyphMap,
     "GlyphCIDMap": GlyphCIDMap,
