@@ -1920,7 +1920,6 @@ class CFF2Index(BaseConverter):
             item.toXML(xmlWriter, font, [("index", i)], name)
 
 
-
 class LookupFlag(UShort):
     def xmlWrite(self, xmlWriter, font, value, name, attrs):
         xmlWriter.simpletag(name, attrs + [("value", value)])
