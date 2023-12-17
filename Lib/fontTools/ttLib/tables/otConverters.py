@@ -140,6 +140,11 @@ class _LazyList(UserList):
         return other + list(self)
 
 
+def _base_converter_read_item(self, i):
+    self.reader.seek(self.pos + i * self.recordSize)
+    return self.conv.read(self.reader, self.font, {})
+
+
 class BaseConverter(object):
     """Base class for converter objects. Apart from the constructor, this
     is an abstract class."""
@@ -185,11 +190,7 @@ class BaseConverter(object):
                 l.append(self.read(reader, font, tableDict))
             return l
         else:
-            def read_item(self, i):
-                self.reader.seek(self.pos + i * self.recordSize)
-                return self.conv.read(self.reader, self.font, {})
-
-            l = _LazyList(read_item for i in range(count))
+            l = _LazyList(_base_converter_read_item for i in range(count))
             l.reader = reader.copy()
             l.pos = l.reader.pos
             l.font = font
@@ -1831,6 +1832,20 @@ class VarDataValue(BaseConverter):
         return safeEval(attrs["value"])
 
 
+def cff2_index_read_item(self, i):
+    self.reader.seek(self.offset_pos + i * self.offSize)
+    offsets = self.readArray(2)
+    self.reader.seek(self.data_pos + offsets[0])
+    item = self.reader.readData(offsets[1] - offsets[0])
+
+    if self.itemClass is not None:
+        obj = self.itemClass()
+        obj.decompile(item, self.font)
+        item = obj
+
+    return item
+
+
 class CFF2Index(BaseConverter):
     def __init__(
         self, name, repeat, aux, tableClass=None, *, itemClass=None, description=""
@@ -1853,6 +1868,7 @@ class CFF2Index(BaseConverter):
                 3: reader.readUInt24Array,
                 4: reader.readULongArray,
             }[offSize]
+
         readArray = getReadArray(reader, offSize)
 
         lazy = font.lazy is not False and count > 8
@@ -1875,20 +1891,7 @@ class CFF2Index(BaseConverter):
                 lastOffset = offset
             return items
         else:
-            def read_item(self, i):
-                self.reader.seek(self.offset_pos + i * self.offSize)
-                offsets = self.readArray(2)
-                self.reader.seek(self.data_pos + offsets[0])
-                item = self.reader.readData(offsets[1] - offsets[0])
-
-                if self.itemClass is not None:
-                    obj = self.itemClass()
-                    obj.decompile(item, self.font)
-                    item = obj
-
-                return item
-
-            l = _LazyList([read_item] * count)
+            l = _LazyList([cff2_index_read_item] * count)
             l.reader = reader.copy()
             l.offset_pos = l.reader.pos
             l.data_pos = l.offset_pos + (count + 1) * offSize
