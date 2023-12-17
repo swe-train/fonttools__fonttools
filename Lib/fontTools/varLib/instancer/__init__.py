@@ -104,6 +104,7 @@ from fontTools.varLib.instancer import names
 from .featureVars import instantiateFeatureVariations
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.varLib.instancer import solver
+from fontTools.ttLib.tables.otTables import VarComponentFlags
 import collections
 import dataclasses
 from contextlib import contextmanager
@@ -472,7 +473,7 @@ def instantiateVARC(varfont, axisLimits):
                     if tag not in axisLimits:
                         newLocation[tag] = loc
                         continue
-                    if component.flags & VarComponentFlags.AXES_HAVE_VARIATION:
+                    if component.flags & VarComponentFlags.AXIS_VALUES_HAVE_VARIATION:
                         raise NotImplementedError(
                             "Instancing accross VarComponent axes with variation is not supported."
                         )
