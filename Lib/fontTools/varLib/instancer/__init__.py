@@ -461,6 +461,8 @@ class OverlapMode(IntEnum):
 def instantiateVARC(varfont, axisLimits):
     log.info("Instantiating VARC tables")
 
+    # TODO(behdad) My confidence in this function is rather low
+
     varc = varfont["VARC"].table
     if varc.VarCompositeGlyphs:
         for glyph in varc.VarCompositeGlyphs.glyphs:
@@ -481,7 +483,7 @@ def instantiateVARC(varfont, axisLimits):
 
     if varc.MultiVarStore:
         store = varc.MultiVarStore
-        store.prune_regions()
+        store.prune_regions()  # Needed?
 
         fvar = varfont["fvar"]
         location = axisLimits.pinnedLocation()
