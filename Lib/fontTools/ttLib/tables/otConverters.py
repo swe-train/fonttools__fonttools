@@ -21,7 +21,6 @@ from .otBase import (
 from .otTables import (
     lookupTypes,
     VarCompositeGlyph,
-    VarTransform,
     AATStateTable,
     AATState,
     AATAction,
@@ -144,6 +143,7 @@ class BaseConverter(object):
             "AxisCount",
             "BaseGlyphRecordCount",
             "LayerRecordCount",
+            "AxisIndicesList",
         ]
         self.description = description
 
@@ -1806,7 +1806,7 @@ class TupleValues:
     def read(self, data, font):
         return TupleVariation.decompileDeltas_(None, data)[0]
 
-    def write(self, writer, font, values):
+    def write(self, writer, font, tableDict, values, repeatIndex=None):
         return bytes(TupleVariation.compileDeltaValues_(values))
 
     def xmlRead(self, attrs, content, font):
@@ -1825,7 +1825,7 @@ def cff2_index_read_item(self, i):
 
     if self._itemClass is not None:
         obj = self._itemClass()
-        obj.decompile(item, self.font)
+        obj.decompile(item, self.font, self.reader.localState)
         item = obj
     elif self._converter is not None:
         item = self._converter.read(item, self.font)
@@ -1881,7 +1881,7 @@ class CFF2Index(BaseConverter):
 
                 if self._itemClass is not None:
                     obj = self._itemClass()
-                    obj.decompile(item, font)
+                    obj.decompile(item, font, reader.localState)
                     item = obj
                 elif self._converter is not None:
                     item = self._converter.read(item, font)
@@ -1914,7 +1914,10 @@ class CFF2Index(BaseConverter):
         if self._itemClass is not None:
             items = [item.compile(font) for item in items]
         elif self._converter is not None:
-            items = [self._converter.write(writer, font, item) for item in items]
+            items = [
+                self._converter.write(writer, font, tableDict, item, i)
+                for i, item in enumerate(items)
+            ]
 
         offsets = [len(item) for item in items]
         offsets = [0] + list(accumulate(offsets))
@@ -2048,7 +2051,6 @@ converterMapping = {
     "STATFlags": STATFlags,
     "TupleList": partial(CFF2Index, itemConverterClass=TupleValues),
     "VarCompositeGlyphList": partial(CFF2Index, itemClass=VarCompositeGlyph),
-    "VarTransformList": partial(CFF2Index, itemClass=VarTransform),
     # AAT
     "CIDGlyphMap": CIDGlyphMap,
     "GlyphCIDMap": GlyphCIDMap,
