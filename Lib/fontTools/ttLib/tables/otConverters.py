@@ -1891,7 +1891,7 @@ class CFF2Index(BaseConverter):
 
                     if self._itemClass is not None:
                         obj = self._itemClass()
-                        obj.decompile(item, self.font, reader_copy.localState)
+                        obj.decompile(item, font, reader_copy.localState)
                         item = obj
                     elif self._converter is not None:
                         item = self._converter.read(item, font)
