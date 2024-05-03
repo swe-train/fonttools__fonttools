@@ -1038,15 +1038,17 @@ class InstantiateAvarTest(object):
     @pytest.mark.parametrize("location", [{"wght": 0.0}, {"wdth": 0.0}])
     def test_pin_and_drop_axis(self, varfont, location):
         location = instancer.AxisLimits(location)
+        normalized = location.normalize(varfont)
 
-        instancer.instantiateAvar(varfont, location)
+        instancer.instantiateAvar(varfont, location, normalized)
 
         assert set(varfont["avar"].segments).isdisjoint(location)
 
     def test_full_instance(self, varfont):
         location = instancer.AxisLimits(wght=0.0, wdth=0.0)
+        normalized = location.normalize(varfont)
 
-        instancer.instantiateAvar(varfont, location)
+        instancer.instantiateAvar(varfont, location, normalized)
 
         assert "avar" not in varfont
 
@@ -1214,8 +1216,9 @@ class InstantiateAvarTest(object):
     )
     def test_limit_axes(self, varfont, axisLimits, expectedSegments):
         axisLimits = instancer.AxisLimits(axisLimits)
+        normalized = axisLimits.normalize(varfont)
 
-        instancer.instantiateAvar(varfont, axisLimits)
+        instancer.instantiateAvar(varfont, axisLimits, normalized)
 
         newSegments = varfont["avar"].segments
         expectedSegments = {
@@ -1239,9 +1242,10 @@ class InstantiateAvarTest(object):
         varfont["avar"].segments["wght"] = invalidSegmentMap
 
         axisLimits = instancer.AxisLimits(wght=(100, 400))
+        normalized = axisLimits.normalize(varfont)
 
         with caplog.at_level(logging.WARNING, logger="fontTools.varLib.instancer"):
-            instancer.instantiateAvar(varfont, axisLimits)
+            instancer.instantiateAvar(varfont, axisLimits, normalized)
 
         assert "Invalid avar" in caplog.text
         assert "wght" not in varfont["avar"].segments

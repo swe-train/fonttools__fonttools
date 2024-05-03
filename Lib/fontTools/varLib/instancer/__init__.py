@@ -450,9 +450,7 @@ class AxisLimits(_BaseAxisLimits):
 
         if usingAvar and "avar" in varfont:
             avar = varfont["avar"]
-            normalizedLimits = avar.renormalizeAxisLimits(
-                normalizedLimits, varfont
-            )
+            normalizedLimits = avar.renormalizeAxisLimits(normalizedLimits, varfont)
 
         return NormalizedAxisLimits(normalizedLimits)
 
@@ -1103,10 +1101,11 @@ def instantiateAvar(varfont, axisLimits, normalizedLimits):
             newSegments[axisTag] = mapping
     avar.segments = newSegments
 
-    if avar.majorVersion == 1:
+    version = getattr(avar, "majorVersion", 1)
+    if version == 1:
         return
 
-    assert avar.majorVersion == 2
+    assert version == 2
     fvarAxes = varfont["fvar"].axes
     varStore = getattr(avar.table, "VarStore", None)
     if varStore is not None:
