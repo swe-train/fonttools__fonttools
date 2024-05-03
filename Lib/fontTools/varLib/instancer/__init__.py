@@ -428,10 +428,6 @@ class AxisLimits(_BaseAxisLimits):
             )
 
 
-        if usingAvar and "avar" in varfont:
-            avar = varfont["avar"]
-            normalizedLimits = avar.renormalizeAxisLimits(normalizedLimits, varfont)
-
         fvarAxes = fvar.getAxes()
         for tag, triple in normalizedLimits.items():
             minV, defaultV, maxV = fvarAxes[tag]
@@ -448,7 +444,13 @@ class AxisLimits(_BaseAxisLimits):
                 *triple, distanceNegative, distancePositive
             )
 
-        return NormalizedAxisLimits(normalizedLimits)
+        normalizedLimits = NormalizedAxisLimits(normalizedLimits)
+
+        if usingAvar and "avar" in varfont:
+            avar = varfont["avar"]
+            normalizedLimits = avar.renormalizeAxisLimits(normalizedLimits, varfont)
+
+        return normalizedLimits
 
 
 class NormalizedAxisLimits(_BaseAxisLimits):
