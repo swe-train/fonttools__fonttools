@@ -198,11 +198,15 @@ class table__a_v_a_r(BaseTTXConverter):
         for axisTag, triple in axisLimits.items():
             avarMapping = avarSegments.get(axisTag, None)
             if avarMapping is not None:
-                triple = tuple(piecewiseLinearMap(value, avarMapping) for value in triple)
+                triple = tuple(
+                    piecewiseLinearMap(value, avarMapping) for value in triple
+                )
             mappedAxisLimits[axisTag] = triple
 
         if self.majorVersion < 2 or versionOneOnly:
-            return {NO_VARIATION_INDEX: 0}, instancer.NormalizedAxisLimits(mappedAxisLimits)
+            return {NO_VARIATION_INDEX: 0}, instancer.NormalizedAxisLimits(
+                mappedAxisLimits
+            )
 
         # Version 2
 
@@ -219,7 +223,9 @@ class table__a_v_a_r(BaseTTXConverter):
         pinnedAxes = axisLimits.pinnedLocation()
         unpinnedAxes = [axis for axis in fvar.axes if axis.axisTag not in pinnedAxes]
 
-        defaultDeltas = instancer.instantiateItemVariationStore(varStore, fvar.axes, limits)
+        defaultDeltas = instancer.instantiateItemVariationStore(
+            varStore, fvar.axes, limits
+        )
 
         for axis in fvar.axes:
             if axis.axisTag in limits:
@@ -233,7 +239,9 @@ class table__a_v_a_r(BaseTTXConverter):
         newLimits = {}
         for axisIdx, axis in enumerate(fvar.axes):
             if axis.axisTag in pinnedAxes:
-                newLimits[axis.axisTag] = instancer.NormalizedAxisTripleAndDistances(0, 0, 0)
+                newLimits[axis.axisTag] = instancer.NormalizedAxisTripleAndDistances(
+                    0, 0, 0
+                )
                 continue
             varIdx = axisIdx
             if varIdxMap is not None:
