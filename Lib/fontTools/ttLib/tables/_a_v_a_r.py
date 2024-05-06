@@ -144,7 +144,6 @@ class table__a_v_a_r(BaseTTXConverter):
             super().fromXML(name, attrs, content, ttFont)
 
     def renormalizeLocation(self, location, font):
-
         if self.majorVersion not in (1, 2):
             raise NotImplementedError("Unknown avar table version")
 
@@ -171,7 +170,6 @@ class table__a_v_a_r(BaseTTXConverter):
 
         out = []
         for varIdx, v in enumerate(coords):
-
             if varIdxMap is not None:
                 varIdx = varIdxMap[varIdx]
 
@@ -189,7 +187,6 @@ class table__a_v_a_r(BaseTTXConverter):
         return mappedLocation
 
     def renormalizeAxisLimits(self, axisLimits, font, *, versionOneOnly=False):
-
         version = getattr(self, "majorVersion", 1)
         if version not in (1, 2):
             raise NotImplementedError("Unknown avar table version")
